@@ -2,11 +2,43 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import socket
+import threading
 
 def commit():
     QApplication.processEvents()
 
 client_sock = None
+
+
+
+class MyWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("My first pyqt5")
+        self.setGeometry(100,100,500,500)
+
+        btn = QPushButton(text="hello", parent=self)
+        btn.move(10,10)
+        btn.clicked.connect(self.hello)
+
+        exit_btn = QPushButton(text="Exit", parent=self)
+        exit_btn.move(50,50)
+        exit_btn.clicked.connect(self.quit)
+
+    def quit(self):
+        QApplication.instance().quit()
+
+    def hello(self):
+        print("Hello button clicked!")
+
+window2 = None
+def server(sock=None):
+    print("SERVER")
+    # tmp_sock, c_info = sock.accept()
+    # print(f"Client from {c_info[0]}:{c_info[1]}")
+    global window2
+    window2 = MyWindow()
+    window2.show()
 
 class OpenServer(QMainWindow):
     def __init__(self):
@@ -70,21 +102,21 @@ class OpenServer(QMainWindow):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 0)
         try:
             sock.bind(('',port))
-            sock.listen(1)
+            sock.listen(5)
             self.status_label.setStyleSheet("color: dodgerblue;")
             self.status_label.setText(f"Open Port: {port}")
             self.status_label.adjustSize()
             commit()
-            tmp_sock, c_info = sock.accept()
+            # threading.Thread(target=server, args=(sock,)).start()
+            server()
+            # TODO
         except:
+            self.status_label.setStyleSheet("color: red;")
             self.status_label.setText(f"You can't open port: {port}")
             self.status_label.adjustSize()
             return
-        self.status_label.setStyleSheet("color: green;")
-        self.status_label.setText(f"Connection from {c_info[0]}:{c_info[1]}")
-        self.status_label.adjustSize()
-        global client_sock
-        client_sock = tmp_sock
+        # self.status_label.setStyleSheet("color: green;")
+        # self.status_label.adjustSize()
         return
 
 app = QApplication(sys.argv)
