@@ -26,7 +26,8 @@ class MyWindow(QWidget):
         exit_btn.clicked.connect(self.quit)
 
     def quit(self):
-        QApplication.instance().quit()
+        # QApplication.instance().quit()
+        self.close()        # Close only current window
 
     def hello(self):
         print("Hello button clicked!")
@@ -84,7 +85,8 @@ class OpenServer(QMainWindow):
         self.status_label = status_label
 
     def finish(self):
-        QApplication.instance().exit()
+        # QApplication.instance().exit()
+        self.close()
 
     def onPort(self, txt):
         # print(self.port.text())
